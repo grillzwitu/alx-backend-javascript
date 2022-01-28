@@ -2,38 +2,47 @@
 
 const fs = require('fs');
 
-const countStudents = (path) => {
-  const promise = (res, rej) => {
-    fs.readFile(path, 'utf8', (err, resData) => {
+const countStudents = (db) => {
+  const promise = (resolve, reject) => {
+    fs.readFile(db, 'utf8', (err, resDat) => {
       if (!err) {
-        const printOut = [];
-        let printItem; // item to printed
-        const data = resData.toString().split('\n');
+        const output = [];
+        let outputData;
+        // convert data to string and split at every new line
+        const data = resDat.toString().split('\n');
+        // console.log(data);
+
+        // further split string data at commas, get data for each student in an array
         let students = data.filter((item) => item);
         students = students.map((item) => item.split(','));
-        printItem = `Number of students: ${students.length - 1}`;
-        console.log(printItem);
-        printOut.push(printItem);
+        // console.log(students);
+        outputData = `Number of students: ${students.length - 1}`; // length -1 because the index 0 contains the headings
+        console.log(outputData);
+        output.push(outputData);
 
-        const fields = {};
+        // sorting the students accoding to their courses
+        const courses = {};
         for (const student in students) {
           if (student !== 0) {
-            if (!fields[students[student][3]]) {
-              fields[students[student][3]] = [];
+            if (!courses[students[student][3]]) {
+              courses[students[student][3]] = [];
             }
-            fields[students[student][3]].push(students[student][0]);
+            courses[students[student][3]].push(students[student][0]);
           }
         }
-        delete fields.field;
-        for (const key of Object.keys(fields)) {
-          printItem = `Number of students in ${key}: ${
-            fields[key].length}. List: ${fields[key].join(', ')}`;
-          console.log(printItem);
-          printOut.push(printItem);
+        delete courses.field;
+        // console.log(courses);
+
+        // Presenting output as required
+        for (const key of Object.keys(courses)) {
+          outputData = `Number of students in ${key}: ${
+            courses[key].length}. List: ${courses[key].join(', ')}`;
+          console.log(outputData);
+          output.push(outputData);
         }
-        res(printOut);
+        resolve(output);
       } else {
-        rej(new Error('Cannot load the database'));
+        reject(new Error('Cannot load the database'));
       }
     });
   };
